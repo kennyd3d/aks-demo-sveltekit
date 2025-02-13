@@ -1,0 +1,20 @@
+name: Build Docker Container on Windows
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - '*'
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Build Windows Docker Image 
+      run: |
+        docker build -t demo-sveltekit:0.0.0 -f Dockerfile .
