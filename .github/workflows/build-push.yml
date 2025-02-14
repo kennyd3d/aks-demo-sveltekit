@@ -5,26 +5,36 @@ on:
     branches:
       - main
     tags:
-      - '*'
+      - "*"
 
 jobs:
   build:
     runs-on: windows-latest
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-    - name: Log in to Docker Hub
-      uses: docker/login-action@v2
-      with:
-        username: ${{ secrets.DOCKER_USER }}
-        password: ${{ secrets.DOCKER_TOKEN }}
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USER }}
+          password: ${{ secrets.DOCKER_TOKEN }}
 
-    - name: Build Windows Docker Image
-      run: |
-        docker build -t ${{ secrets.DOCKER_USER }}/demo-sveltekit:0.0.0 -f Dockerfile .
+      - name: Build Windows Docker Image
+        run: |
+          docker build --build-arg ORIGIN=${{ secrets.ORIGIN }} -t ${{ secrets.DOCKER_USER }}/demo-sveltekit:0.0.0 -f Dockerfile .
 
-    - name: Push Docker Image
-      run: |
-        docker push ${{ secrets.DOCKER_USER }}/demo-sveltekit:0.0.0
+      - name: Push Docker Image
+        run: |
+          docker push ${{ secrets.DOCKER_USER }}/demo-sveltekit:0.0.0
+
+      - name: Install kubectl
+        uses: azure/setup-kubectl@v4
+        with:
+          version: "1.31.1"
+        id: install
+
+      - name: Apply Deployment
+        run: |
+          kubectl apply -f ./CICD/deployment.yaml
