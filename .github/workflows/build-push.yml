@@ -16,12 +16,11 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Set up Kubeconfig (Windows)
-        shell: pwsh
         run: |
-          Remove-Item -Force -Path "$env:USERPROFILE\.kube\config" -ErrorAction SilentlyContinue
-          [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String("${{ secrets.KUBE_B64 }}")) | Set-Content -Path "$env:USERPROFILE\.kube\config" -NoNewline
-          icacls "$env:USERPROFILE\.kube\config" /inheritance:r /grant:r "$($env:USERNAME):F"
-      
+          echo ${{ secrets.KUBE_B64 }} | certutil -decode - "%USERPROFILE%\\.kube\\config"
+          icacls "%USERPROFILE%\\.kube\\config" /inheritance:r /grant:r "%USERNAME%:R"
+        shell: cmd
+
       - name: Test Kubeconfig
         run: kubectl get nodes
   
