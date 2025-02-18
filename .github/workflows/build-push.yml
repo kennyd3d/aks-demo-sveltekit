@@ -15,11 +15,11 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Kubeconfig (Windows)
+      - name: Decode and write kubeconfig
+        shell: pwsh
         run: |
-          [System.IO.File]::WriteAllBytes("$env:USERPROFILE\.kube\config", [System.Convert]::FromBase64String("${{ secrets.KUBE_B64 }}"))
-        shell: powershell
-      
+          $KubeConfig = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String("${{ secrets.KUBE_B64 }}"))
+          Set-Content -Path $env:USERPROFILE\.kube\config -Value $KubeConfig
       
       - name: Test Kubeconfig
         run: kubectl get nodes
