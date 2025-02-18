@@ -15,7 +15,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-
       - name: Create .kube directory
         shell: pwsh
         run: |
@@ -29,9 +28,6 @@ jobs:
         run: |
           $KubeConfig = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String("${{ secrets.KUBE_B64 }}"))
           Set-Content -Path "$env:USERPROFILE\.kube\config" -Value $KubeConfig
-          
-      - name: Test Kubeconfig
-        run: kubectl get nodes
   
       - name: Build Windows Docker Image 
         run: |
@@ -54,11 +50,6 @@ jobs:
       - name: Install kubectl
         uses: azure/setup-kubectl@v4
         id: install
-        
-      - uses: MinoruSekine/setup-scoop@v4.0.1
-        with:
-          buckets: main
-          apps: kubectl
 
       - name: Apply Deployment
         run: |
