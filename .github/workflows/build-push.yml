@@ -17,8 +17,9 @@ jobs:
 
       - name: Set up Kubeconfig (Windows)
         run: |
-          echo ${{ secrets.KUBE_B64 }} | certutil -decode - $env:USERPROFILE\.kube\config
+          [System.IO.File]::WriteAllBytes("$env:USERPROFILE\.kube\config", [System.Convert]::FromBase64String("${{ secrets.KUBE_B64 }}"))
         shell: powershell
+      
       
       - name: Test Kubeconfig
         run: kubectl get nodes
