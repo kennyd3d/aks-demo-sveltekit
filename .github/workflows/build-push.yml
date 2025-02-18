@@ -17,10 +17,9 @@ jobs:
 
       - name: Set up Kubeconfig (Windows)
         run: |
-          echo ${{ secrets.KUBE_B64 }} | certutil -decode - "%USERPROFILE%\\.kube\\config"
-          icacls "%USERPROFILE%\\.kube\\config" /inheritance:r /grant:r "%USERNAME%:R"
-        shell: cmd
-
+          echo ${{ secrets.KUBE_B64 }} | certutil -decode - $env:USERPROFILE\.kube\config
+        shell: powershell
+      
       - name: Test Kubeconfig
         run: kubectl get nodes
   
