@@ -17,7 +17,6 @@ jobs:
 
       - name: Set up Kubeconfig
         run: |
-          rm ~/.kube/config
           echo "${{ secrets.KUBE_B64 }}" | base64 -d > ~/.kube/config
           chmod 600 ~/.kube/config
   
