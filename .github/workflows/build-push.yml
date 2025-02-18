@@ -15,12 +15,21 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+
+      - name: Create .kube directory
+        shell: pwsh
+        run: |
+          $kubeConfigDir = "$env:USERPROFILE\.kube"
+          if (-not (Test-Path $kubeConfigDir)) {
+            New-Item -Path $kubeConfigDir -ItemType Directory
+          }
+          
       - name: Decode and write kubeconfig
         shell: pwsh
         run: |
           $KubeConfig = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String("${{ secrets.KUBE_B64 }}"))
-          Set-Content -Path $env:USERPROFILE\.kube\config -Value $KubeConfig
-      
+          Set-Content -Path "$env:USERPROFILE\.kube\config" -Value $KubeConfig
+          
       - name: Test Kubeconfig
         run: kubectl get nodes
   
