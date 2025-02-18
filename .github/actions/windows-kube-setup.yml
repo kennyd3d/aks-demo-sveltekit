@@ -1,0 +1,26 @@
+name: 'Setup KubeConfig'
+description: 'Sets up kubectl with the provided kubeconfig secret'
+inputs:
+  kube_b64:
+    description: 'Base64 encoded kubeconfig'
+    required: true
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Install kubectl
+      uses: azure/setup-kubectl@v4
+
+    - name: Create .kube directory
+      shell: pwsh
+      run: |
+        $kubeConfigDir = "$env:USERPROFILE\.kube"
+        if (-not (Test-Path $kubeConfigDir)) {
+          New-Item -Path $kubeConfigDir -ItemType Directory
+        }
+        
+    - name: Decode and write kubeconfig
+      shell: pwsh
+      run: |
+        $KubeConfig = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String("${{ inputs.kube_b64 }}"))
+        Set-Content -Path "$env:USERPROFILE\.kube\config" -Value $KubeConfig

@@ -15,19 +15,10 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Create .kube directory
-        shell: pwsh
-        run: |
-          $kubeConfigDir = "$env:USERPROFILE\.kube"
-          if (-not (Test-Path $kubeConfigDir)) {
-            New-Item -Path $kubeConfigDir -ItemType Directory
-          }
-          
-      - name: Decode and write kubeconfig
-        shell: pwsh
-        run: |
-          $KubeConfig = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String("${{ secrets.KUBE_B64 }}"))
-          Set-Content -Path "$env:USERPROFILE\.kube\config" -Value $KubeConfig
+      - name: Set up kubeconfig
+        uses: ./.github/actions/windows-kube-setup.yml
+        with:
+          kube_b64: ${{ secrets.KUBE_B64 }}
   
       - name: Build Windows Docker Image 
         run: |
@@ -46,11 +37,7 @@ jobs:
       - name: Push Docker Image
         run: |
           docker push ${{ secrets.DOCKER_USER }}/demo-sveltekit:0.0.1
-
-      - name: Install kubectl
-        uses: azure/setup-kubectl@v4
-        id: install
-
+          
       - name: Apply Deployment
         run: |
           kubectl apply -f ./CICD/deployment.yaml
