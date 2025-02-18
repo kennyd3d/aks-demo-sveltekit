@@ -15,11 +15,13 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Kubeconfig
+      - name: Set up Kubeconfig (Windows)
+        shell: pwsh
         run: |
-          echo "${{ secrets.KUBE_B64 }}" | base64 -d > ~/.kube/config
-          chmod 600 ~/.kube/config
-  
+          Remove-Item -Force -Path "$env:USERPROFILE\.kube\config" -ErrorAction SilentlyContinue
+          [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String("${{ secrets.KUBE_B64 }}")) | Set-Content -Path "$env:USERPROFILE\.kube\config" -NoNewline
+          icacls "$env:USERPROFILE\.kube\config" /inheritance:r /grant:r "$($env:USERNAME):F"
+      
       - name: Test Kubeconfig
         run: kubectl get nodes
   
