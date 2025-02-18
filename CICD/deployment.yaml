@@ -18,7 +18,7 @@ spec:
         "kubernetes.io/os": windows
       containers:
       - name: sveltekit
-        image: docker.io/kennyd3d/demo-sveltekit:0.0.0
+        image: docker.io/kennyd3d/demo-sveltekit:0.0.1
         ports:
         - containerPort: 3000
         resources:
